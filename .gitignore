@@ -1,0 +1,15 @@
+# Environment variables (Contains your password!)
+.env
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database migration history
+alembic/versions/__pycache__/
+
+# OS files
+.DS_Store
+Thumbs.db
