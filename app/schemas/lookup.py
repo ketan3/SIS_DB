@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class CategoryCreate(BaseModel):
@@ -18,8 +19,9 @@ class ReligionResponse(ReligionCreate):
 
 class CasteCreate(BaseModel):
     caste_name: str
+    religion_id: Optional[int] = None  # Scopes caste to a religion (Hindu/Muslim/etc.)
 
 class CasteResponse(CasteCreate):
     caste_id: int
     class Config:
-        from_attributes = True
+        from_attributes = True

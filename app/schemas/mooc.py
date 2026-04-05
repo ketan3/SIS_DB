@@ -27,6 +27,7 @@ class MoocCourseResponse(MoocCourseCreate):
 
 class MoocEnrollmentCreate(BaseModel):
     mooc_course_id: int
+    enrollment_id: Optional[int] = None  # Links MOOC credit to a specific semester
     grade: Optional[str] = None
     completion_date: Optional[date] = None
     certificate_url: Optional[str] = None

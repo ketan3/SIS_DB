@@ -25,6 +25,8 @@ class StudentMoocEnrollment(Base):
     mooc_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     student_id: Mapped[int] = mapped_column(ForeignKey('student_information.student_id'), nullable=False)
     mooc_course_id: Mapped[int] = mapped_column(ForeignKey('mooc_courses.mooc_course_id'), nullable=False)
+    # Links to the academic semester this MOOC was completed in (for credit mapping)
+    enrollment_id: Mapped[int | None] = mapped_column(ForeignKey('enrollment_mapping.enrollment_id'), nullable=True)
     
     grade: Mapped[str | None] = mapped_column(String(10))
     completion_date: Mapped[date | None] = mapped_column(Date)

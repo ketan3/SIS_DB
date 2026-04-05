@@ -8,8 +8,4 @@ register_routers(app)
 
 @app.get("/")
 async def root():
-    return {"message": f"Welcome to {settings.PROJECT_NAME}"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "Database models loaded successfully!"}
+    return {"message": f"Welcome to {settings.PROJECT_NAME}"}

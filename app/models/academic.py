@@ -7,16 +7,16 @@ class EnrollmentMapping(Base):
     
     enrollment_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     student_id: Mapped[int] = mapped_column(ForeignKey('student_information.student_id'), nullable=False)
-    
-    department: Mapped[str | None] = mapped_column(String(100))
-    department_id: Mapped[int | None] = mapped_column(Integer) # External link
+
+    # String name fields removed — names should be fetched from their respective external modules.
+    # Storing both string + ID leads to sync drift.
+    department_id: Mapped[int | None] = mapped_column(Integer)  # External link
     program: Mapped[str | None] = mapped_column(String(100))
-    class_name: Mapped[str | None] = mapped_column(String(50), name='class')
-    class_id: Mapped[int | None] = mapped_column(Integer) # External link
+    class_id: Mapped[int | None] = mapped_column(Integer)       # External link
     division: Mapped[str | None] = mapped_column(String(20))
     batch: Mapped[str | None] = mapped_column(String(20))
-    placement_id: Mapped[int | None] = mapped_column(Integer) # External link
-    academic_id: Mapped[int | None] = mapped_column(Integer) # External link
+    placement_id: Mapped[int | None] = mapped_column(Integer)   # External link
+    academic_id: Mapped[int | None] = mapped_column(Integer)    # External link
 
 class CertificateRequest(Base):
     __tablename__ = 'certificate_request'

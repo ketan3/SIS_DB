@@ -1,5 +1,5 @@
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 
 class Category(Base):
@@ -18,4 +18,6 @@ class Caste(Base):
     __tablename__ = 'castes'
     
     caste_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    caste_name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    caste_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    # A caste belongs to a religion — Hindu castes differ from Muslim castes etc.
+    religion_id: Mapped[int | None] = mapped_column(ForeignKey('religions.religion_id'), nullable=True)
