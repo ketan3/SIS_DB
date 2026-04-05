@@ -42,3 +42,17 @@ class MoocEnrollmentResponse(MoocEnrollmentCreate):
     student_id: int
     class Config:
         from_attributes = True
+
+
+# Issue #9: Expanded response that includes full course details for frontend cards
+class MoocEnrollmentDetailResponse(BaseModel):
+    mooc_id: int
+    student_id: int
+    enrollment_id: Optional[int] = None
+    grade: Optional[str] = None
+    completion_date: Optional[date] = None
+    certificate_url: Optional[str] = None
+    course: MoocCourseResponse  # Full course detail embedded
+
+    class Config:
+        from_attributes = True

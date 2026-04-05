@@ -58,14 +58,19 @@ class StudentFamilyDetails(Base):
     
     parent1_name: Mapped[str | None] = mapped_column(String(100))
     parent1_phone: Mapped[str | None] = mapped_column(String(15))
+    parent1_email: Mapped[str | None] = mapped_column(String(100))  # Issue #5
     parent1_occupation: Mapped[str | None] = mapped_column(String(100))
     parent1_photo: Mapped[str | None] = mapped_column(String(255))
     
     parent2_name: Mapped[str | None] = mapped_column(String(100))
     parent2_phone: Mapped[str | None] = mapped_column(String(15))
+    parent2_email: Mapped[str | None] = mapped_column(String(100))  # Issue #5
     parent2_occupation: Mapped[str | None] = mapped_column(String(100))
     
     guardian_type: Mapped[str | None] = mapped_column(String(50))
     guardian_name: Mapped[str | None] = mapped_column(String(100))
     guardian_phone: Mapped[str | None] = mapped_column(String(15))
+    guardian_email: Mapped[str | None] = mapped_column(String(100))  # Issue #5
     guardian_occupation: Mapped[str | None] = mapped_column(String(100))
+    # Issue #4: Link guardian's address if different from student's
+    guardian_address_id: Mapped[int | None] = mapped_column(ForeignKey('addresses.address_id'), nullable=True)

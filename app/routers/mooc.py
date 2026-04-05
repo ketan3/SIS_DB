@@ -5,7 +5,8 @@ from app.db.database import get_db
 from app.models.mooc import MoocCourse, StudentMoocEnrollment
 from app.schemas.mooc import (
     MoocCourseCreate, MoocCourseUpdate, MoocCourseResponse,
-    MoocEnrollmentCreate, MoocEnrollmentUpdate, MoocEnrollmentResponse
+    MoocEnrollmentCreate, MoocEnrollmentUpdate, MoocEnrollmentResponse,
+    MoocEnrollmentDetailResponse
 )
 
 router = APIRouter(tags=["MOOC"])
@@ -70,12 +71,27 @@ async def create_mooc_enrollment(student_id: int, data: MoocEnrollmentCreate, db
     await db.refresh(enrollment)
     return enrollment
 
-@router.get("/students/{student_id}/mooc-enrollments", response_model=list[MoocEnrollmentResponse])
+@router.get("/students/{student_id}/mooc-enrollments", response_model=list[MoocEnrollmentDetailResponse])
 async def get_mooc_enrollments(student_id: int, db: AsyncSession = Depends(get_db)):
+    """Returns all MOOC enrollments with full course details expanded (name, platform, credits etc.)"""
     result = await db.execute(
-        select(StudentMoocEnrollment).where(StudentMoocEnrollment.student_id == student_id)
+        select(StudentMoocEnrollment, MoocCourse)
+        .join(MoocCourse, StudentMoocEnrollment.mooc_course_id == MoocCourse.mooc_course_id)
+        .where(StudentMoocEnrollment.student_id == student_id)
     )
-    return result.scalars().all()
+    rows = result.all()
+    response = []
+    for enrollment, course in rows:
+        response.append(MoocEnrollmentDetailResponse(
+            mooc_id=enrollment.mooc_id,
+            student_id=enrollment.student_id,
+            enrollment_id=enrollment.enrollment_id,
+            grade=enrollment.grade,
+            completion_date=enrollment.completion_date,
+            certificate_url=enrollment.certificate_url,
+            course=MoocCourseResponse.model_validate(course)
+        ))
+    return response
 
 @router.patch("/students/{student_id}/mooc-enrollments/{mooc_id}", response_model=MoocEnrollmentResponse)
 async def update_mooc_enrollment(student_id: int, mooc_id: int, data: MoocEnrollmentUpdate, db: AsyncSession = Depends(get_db)):

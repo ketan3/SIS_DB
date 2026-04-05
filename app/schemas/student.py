@@ -99,17 +99,21 @@ class DemographicsResponse(DemographicsCreate):
 class FamilyCreate(BaseModel):
     parent1_name: Optional[str] = None
     parent1_phone: Optional[str] = None
+    parent1_email: Optional[str] = None
     parent1_occupation: Optional[str] = None
     parent1_photo: Optional[str] = None
 
     parent2_name: Optional[str] = None
     parent2_phone: Optional[str] = None
+    parent2_email: Optional[str] = None
     parent2_occupation: Optional[str] = None
 
     guardian_type: Optional[str] = None
     guardian_name: Optional[str] = None
     guardian_phone: Optional[str] = None
+    guardian_email: Optional[str] = None
     guardian_occupation: Optional[str] = None
+    guardian_address_id: Optional[int] = None  # FK to addresses table
 
 
 class FamilyResponse(FamilyCreate):
