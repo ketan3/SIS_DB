@@ -12,6 +12,8 @@ from app.schemas.lookup import (
 router = APIRouter(tags=["Lookups"])
 
 # ─── Categories ───────────────────────────────────────────────────────
+# NOTE: DELETE is intentionally removed — categories are FK-referenced in
+# StudentDemographics. Deleting them would break existing student records.
 
 @router.post("/categories", response_model=CategoryResponse, status_code=201)
 async def create_category(data: CategoryCreate, db: AsyncSession = Depends(get_db)):
@@ -37,16 +39,9 @@ async def update_category(category_id: int, data: CategoryCreate, db: AsyncSessi
     await db.refresh(category)
     return category
 
-@router.delete("/categories/{category_id}", status_code=204)
-async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Category).where(Category.category_id == category_id))
-    category = result.scalar_one_or_none()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    await db.delete(category)
-    await db.commit()
-
 # ─── Religions ────────────────────────────────────────────────────────
+# NOTE: DELETE is intentionally removed — religions are FK-referenced in
+# StudentDemographics. Deleting them would break existing student records.
 
 @router.post("/religions", response_model=ReligionResponse, status_code=201)
 async def create_religion(data: ReligionCreate, db: AsyncSession = Depends(get_db)):
@@ -72,16 +67,9 @@ async def update_religion(religion_id: int, data: ReligionCreate, db: AsyncSessi
     await db.refresh(religion)
     return religion
 
-@router.delete("/religions/{religion_id}", status_code=204)
-async def delete_religion(religion_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Religion).where(Religion.religion_id == religion_id))
-    religion = result.scalar_one_or_none()
-    if not religion:
-        raise HTTPException(status_code=404, detail="Religion not found")
-    await db.delete(religion)
-    await db.commit()
-
 # ─── Castes ───────────────────────────────────────────────────────────
+# NOTE: DELETE is intentionally removed — castes are FK-referenced in
+# StudentDemographics. Deleting them would break existing student records.
 
 @router.post("/castes", response_model=CasteResponse, status_code=201)
 async def create_caste(data: CasteCreate, db: AsyncSession = Depends(get_db)):
@@ -106,12 +94,3 @@ async def update_caste(caste_id: int, data: CasteCreate, db: AsyncSession = Depe
     await db.commit()
     await db.refresh(caste)
     return caste
-
-@router.delete("/castes/{caste_id}", status_code=204)
-async def delete_caste(caste_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Caste).where(Caste.caste_id == caste_id))
-    caste = result.scalar_one_or_none()
-    if not caste:
-        raise HTTPException(status_code=404, detail="Caste not found")
-    await db.delete(caste)
-    await db.commit()

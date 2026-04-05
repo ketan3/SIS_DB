@@ -10,7 +10,10 @@ from app.schemas.address import (
 
 router = APIRouter(tags=["Addresses"])
 
-# ─── Address CRUD ─────────────────────────────────────────────────────
+# ─── Address ──────────────────────────────────────────────────────────
+# NOTE: GET /addresses and DELETE /addresses/{id} are intentionally removed.
+# Addresses are only meaningful in the context of a student.
+# Use POST to create an address record, then link it via StudentAddress.
 
 @router.post("/addresses", response_model=AddressResponse, status_code=201)
 async def create_address(data: AddressCreate, db: AsyncSession = Depends(get_db)):
@@ -18,19 +21,6 @@ async def create_address(data: AddressCreate, db: AsyncSession = Depends(get_db)
     db.add(address)
     await db.commit()
     await db.refresh(address)
-    return address
-
-@router.get("/addresses", response_model=list[AddressResponse])
-async def get_addresses(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Address))
-    return result.scalars().all()
-
-@router.get("/addresses/{address_id}", response_model=AddressResponse)
-async def get_address(address_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Address).where(Address.address_id == address_id))
-    address = result.scalar_one_or_none()
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
     return address
 
 @router.patch("/addresses/{address_id}", response_model=AddressResponse)
@@ -44,15 +34,6 @@ async def update_address(address_id: int, data: AddressCreate, db: AsyncSession 
     await db.commit()
     await db.refresh(address)
     return address
-
-@router.delete("/addresses/{address_id}", status_code=204)
-async def delete_address(address_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Address).where(Address.address_id == address_id))
-    address = result.scalar_one_or_none()
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
-    await db.delete(address)
-    await db.commit()
 
 # ─── StudentAddress CRUD ──────────────────────────────────────────────
 

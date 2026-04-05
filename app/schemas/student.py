@@ -66,6 +66,7 @@ class StudentUpdate(BaseModel):
 
 class StudentResponse(StudentCreate):
     student_id: int
+    is_active: bool = True
 
     class Config:
         from_attributes = True
@@ -74,6 +75,13 @@ class StudentResponse(StudentCreate):
 # ─── StudentDemographics ──────────────────────────────────────────────
 
 class DemographicsCreate(BaseModel):
+    category_id: Optional[int] = None
+    religion_id: Optional[int] = None
+    caste_id: Optional[int] = None
+
+
+# Separate Update schema — all fields optional for PATCH
+class DemographicsUpdate(BaseModel):
     category_id: Optional[int] = None
     religion_id: Optional[int] = None
     caste_id: Optional[int] = None

@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, ForeignKey, Text
+from sqlalchemy import String, Integer, ForeignKey, Text, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base_class import Base
 
@@ -25,6 +25,7 @@ class CertificateRequest(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey('student_information.student_id'), nullable=False)
     
     certificate_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default='pending', server_default='pending')
     reason: Mapped[str | None] = mapped_column(Text)
     academic_year: Mapped[str | None] = mapped_column(String(20))
     last_academic_year: Mapped[str | None] = mapped_column(String(20))
@@ -33,3 +34,10 @@ class CertificateRequest(Base):
     last_fee_receipt: Mapped[str | None] = mapped_column(String(255))
     admission_proof: Mapped[str | None] = mapped_column(String(255))
     applicant_signature: Mapped[str | None] = mapped_column(String(255))
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending', 'approved', 'rejected', 'dispatched')",
+            name='chk_certificate_status'
+        ),
+    )

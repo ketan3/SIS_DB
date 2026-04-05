@@ -23,7 +23,10 @@ class StudentInformation(Base):
     prn_number: Mapped[str | None] = mapped_column(String(20), unique=True)
     
     admission_date: Mapped[date | None] = mapped_column(Date)
-    
+
+    # Status flag — use soft-delete instead of hard DELETE
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, server_default="true")
+
     # Financial fields
     total_academic_fee: Mapped[float | None] = mapped_column(Numeric(10, 2))
     total_submitted_fee: Mapped[int | None] = mapped_column(Integer)

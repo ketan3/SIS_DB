@@ -5,7 +5,7 @@ from app.db.database import get_db
 from app.models.student import StudentInformation, StudentDemographics, StudentFamilyDetails
 from app.schemas.student import (
     StudentCreate, StudentUpdate, StudentResponse,
-    DemographicsCreate, DemographicsResponse,
+    DemographicsCreate, DemographicsUpdate, DemographicsResponse,
     FamilyCreate, FamilyResponse
 )
 
@@ -55,16 +55,18 @@ async def update_student(student_id: int, data: StudentUpdate, db: AsyncSession 
     return student
 
 
-@router.delete("/{student_id}", status_code=204)
-async def delete_student(student_id: int, db: AsyncSession = Depends(get_db)):
+@router.delete("/{student_id}", status_code=200)
+async def deactivate_student(student_id: int, db: AsyncSession = Depends(get_db)):
+    """Soft-delete: marks student as inactive instead of permanently removing them."""
     result = await db.execute(
         select(StudentInformation).where(StudentInformation.student_id == student_id)
     )
     student = result.scalar_one_or_none()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    await db.delete(student)
+    student.is_active = False
     await db.commit()
+    return {"detail": f"Student {student_id} has been deactivated."}
 
 
 # ─── StudentDemographics CRUD ─────────────────────────────────────────
@@ -90,7 +92,7 @@ async def get_demographics(student_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.patch("/{student_id}/demographics", response_model=DemographicsResponse)
-async def update_demographics(student_id: int, data: DemographicsCreate, db: AsyncSession = Depends(get_db)):
+async def update_demographics(student_id: int, data: DemographicsUpdate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(StudentDemographics).where(StudentDemographics.student_id == student_id)
     )

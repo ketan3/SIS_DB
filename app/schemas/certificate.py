@@ -14,6 +14,7 @@ class CertificateCreate(BaseModel):
 
 class CertificateUpdate(BaseModel):
     certificate_type: Optional[str] = None
+    status: Optional[str] = None  # pending | approved | rejected | dispatched
     reason: Optional[str] = None
     academic_year: Optional[str] = None
     last_academic_year: Optional[str] = None
@@ -26,5 +27,7 @@ class CertificateUpdate(BaseModel):
 class CertificateResponse(CertificateCreate):
     request_id: int
     student_id: int
+    status: str = 'pending'
+
     class Config:
         from_attributes = True

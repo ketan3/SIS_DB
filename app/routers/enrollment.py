@@ -20,6 +20,15 @@ async def get_enrollments(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(EnrollmentMapping))
     return result.scalars().all()
 
+# NOTE: This route MUST come before /{enrollment_id} — otherwise FastAPI
+# tries to cast the literal "student" as an int and returns a 422 error.
+@router.get("/student/{student_id}", response_model=list[EnrollmentResponse])
+async def get_enrollments_by_student(student_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(EnrollmentMapping).where(EnrollmentMapping.student_id == student_id)
+    )
+    return result.scalars().all()
+
 @router.get("/{enrollment_id}", response_model=EnrollmentResponse)
 async def get_enrollment(enrollment_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -29,13 +38,6 @@ async def get_enrollment(enrollment_id: int, db: AsyncSession = Depends(get_db))
     if not enrollment:
         raise HTTPException(status_code=404, detail="Enrollment not found")
     return enrollment
-
-@router.get("/student/{student_id}", response_model=list[EnrollmentResponse])
-async def get_enrollments_by_student(student_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(EnrollmentMapping).where(EnrollmentMapping.student_id == student_id)
-    )
-    return result.scalars().all()
 
 @router.patch("/{enrollment_id}", response_model=EnrollmentResponse)
 async def update_enrollment(enrollment_id: int, data: EnrollmentUpdate, db: AsyncSession = Depends(get_db)):
