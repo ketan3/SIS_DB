@@ -8,6 +8,7 @@ from app.schemas.mooc import (
     MoocEnrollmentCreate, MoocEnrollmentUpdate, MoocEnrollmentResponse,
     MoocEnrollmentDetailResponse
 )
+from app.core.dependencies import get_student_or_404
 
 router = APIRouter(tags=["MOOC"])
 
@@ -65,6 +66,7 @@ async def delete_mooc_course(mooc_course_id: int, db: AsyncSession = Depends(get
 
 @router.post("/students/{student_id}/mooc-enrollments", response_model=MoocEnrollmentResponse, status_code=201)
 async def create_mooc_enrollment(student_id: int, data: MoocEnrollmentCreate, db: AsyncSession = Depends(get_db)):
+    await get_student_or_404(student_id, db)  # Guard: 404 if student doesn't exist
     enrollment = StudentMoocEnrollment(student_id=student_id, **data.model_dump())
     db.add(enrollment)
     await db.commit()

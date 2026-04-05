@@ -7,6 +7,7 @@ from app.schemas.address import (
     AddressCreate, AddressResponse,
     StudentAddressCreate, StudentAddressResponse
 )
+from app.core.dependencies import get_student_or_404
 
 router = APIRouter(tags=["Addresses"])
 
@@ -39,6 +40,7 @@ async def update_address(address_id: int, data: AddressCreate, db: AsyncSession 
 
 @router.post("/students/{student_id}/addresses", response_model=StudentAddressResponse, status_code=201)
 async def create_student_address(student_id: int, data: StudentAddressCreate, db: AsyncSession = Depends(get_db)):
+    await get_student_or_404(student_id, db)  # Guard: 404 if student doesn't exist
     student_address = StudentAddress(student_id=student_id, **data.model_dump())
     db.add(student_address)
     await db.commit()

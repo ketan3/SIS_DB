@@ -4,11 +4,13 @@ from sqlalchemy import select
 from app.db.database import get_db
 from app.models.academic import CertificateRequest
 from app.schemas.certificate import CertificateCreate, CertificateUpdate, CertificateResponse
+from app.core.dependencies import get_student_or_404
 
 router = APIRouter(tags=["Certificate Requests"])
 
 @router.post("/students/{student_id}/certificates", response_model=CertificateResponse, status_code=201)
 async def create_certificate_request(student_id: int, data: CertificateCreate, db: AsyncSession = Depends(get_db)):
+    await get_student_or_404(student_id, db)  # Guard: 404 if student doesn't exist
     certificate = CertificateRequest(student_id=student_id, **data.model_dump())
     db.add(certificate)
     await db.commit()

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel
 
 class AddressCreate(BaseModel):
@@ -16,7 +16,7 @@ class AddressResponse(AddressCreate):
 
 class StudentAddressCreate(BaseModel):
     address_id: int
-    address_type: str  # permanent, current, guardian
+    address_type: Literal["permanent", "current", "guardian"]  # Validated at schema level
 
 class StudentAddressResponse(StudentAddressCreate):
     student_address_id: int

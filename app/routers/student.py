@@ -8,6 +8,7 @@ from app.schemas.student import (
     DemographicsCreate, DemographicsUpdate, DemographicsResponse,
     FamilyCreate, FamilyResponse
 )
+from app.core.dependencies import get_student_or_404
 
 router = APIRouter(prefix="/students", tags=["Student Profile"])
 
@@ -25,7 +26,10 @@ async def create_student(data: StudentCreate, db: AsyncSession = Depends(get_db)
 
 @router.get("/", response_model=list[StudentResponse])
 async def get_all_students(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(StudentInformation))
+    """Returns only active students. Deactivated students are excluded."""
+    result = await db.execute(
+        select(StudentInformation).where(StudentInformation.is_active == True)
+    )
     return result.scalars().all()
 
 
@@ -73,6 +77,7 @@ async def deactivate_student(student_id: int, db: AsyncSession = Depends(get_db)
 
 @router.post("/{student_id}/demographics", response_model=DemographicsResponse, status_code=201)
 async def create_demographics(student_id: int, data: DemographicsCreate, db: AsyncSession = Depends(get_db)):
+    await get_student_or_404(student_id, db)  # Guard: 404 if student doesn't exist
     demographics = StudentDemographics(student_id=student_id, **data.model_dump())
     db.add(demographics)
     await db.commit()
@@ -110,6 +115,7 @@ async def update_demographics(student_id: int, data: DemographicsUpdate, db: Asy
 
 @router.post("/{student_id}/family", response_model=FamilyResponse, status_code=201)
 async def create_family(student_id: int, data: FamilyCreate, db: AsyncSession = Depends(get_db)):
+    await get_student_or_404(student_id, db)  # Guard: 404 if student doesn't exist
     family = StudentFamilyDetails(student_id=student_id, **data.model_dump())
     db.add(family)
     await db.commit()
